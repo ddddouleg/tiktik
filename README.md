@@ -1,36 +1,55 @@
-# Netless App Template
+<!-- 内容建议:以下为建议你可以补充的内容要点和方向 -->
 
-[Netless App 文档](https://github.com/netless-io/window-manager/blob/master/docs/develop-app.md)
+# tiktik
 
-## 快速开始
+<!-- 请将上面“项目名”替换为你本次参赛作品的项目名 -->
 
-前置条件：至少需要安装了 `git`、`node 16`、`npm 8`。
+## 项目简介
 
-1.  点击右上角 `Use this template` 生成一个属于你自己的仓库
+<!-- 请描述此次参赛作品的简介，建议用「一句话简介」+ 详细介绍的形式 -->
 
-    如果需要选用原生以外的模版，请勾上 `Include all branches`
+What?
 
-    > 如果你安装了 [GitHub CLI](https://cli.github.com)，也可以用这个命令一键生成并 clone 本仓库
-    >
-    >     gh repo create your-app-name --template netless-io/community-apps --include-all-branches
+一款简易节拍器插件。
 
-2.  在 .env 文件里配置白板房间 UUID 和 Token
+Why?
 
-    请将本目录下的 .env.example 文件复制一份，重命名为 .env 或 .env.local 后，在里面填写必须的白板配置信息。你可以在 [Netless Workshop](https://workshop.netless.link) 申请专用的白板配置。
+本人在线学习乐器（通过直播）时，如吉他，经常把握不准节奏，直播老师一般会让学生自己准备一个实体节拍器进行自行练习。但是如果我想在直播课堂上和老师同步学习，那我就得对齐我和老师的节拍声，比较麻烦。
 
-3.  执行 `npm install` 安装依赖
+How?
 
-4.  执行 `npm start` 进行本地开发
+在白板教师里进行在线音乐学习时，使用节拍器插件，就可以解决这个问题，老师和同学用一个节拍，方便纠错等节奏上的学习。
 
-## 提交到社区 App 列表
+## 安装部署指南
 
-开发完 App 后，可以在 [Community Apps](https://github.com/netless-io/community-apps) 仓库提交你的项目，方便更多人发现和使用。
+<!-- 请描述该应用的使用步骤，包括下载、依赖安装、参数及软硬件配置（如有）等，特别提醒：如果需要特殊硬件支持，请在 README 中写明，也和大赛官方沟通。 -->
+
+参见 https://github.com/netless-io/community-app-template
+
+## 功能简介
+
+<!-- 请给出该应用的主要功能点 -->
+
+支持 0-240 bpm 范围的节拍设置
+
+## 技术栈
+
+<!-- 请给出该应用主要的技术栈，包括使用的声网和环信（如有用） SDK 版本 -->
+
+@netless/fastboard: ^0.3.3
+@netless/window-manager": ^0.4.30,
+
+---
+
+# 许可协议
+
+该参赛作品的源代码以`MIT`开源协议对外开源
 
 ## 清单
 
-- [ ] 添加 .env 或 .env.local
-- [ ] 修改 package.json 里的 `name`，`private` 等字段
-- [ ] (可选) 发布 npm 包
+- [ √ ] 添加 .env 或 .env.local
+- [ √ ] 修改 package.json 里的 `name`，`private` 等字段
+- [ x ] (可选) 发布 npm 包
 - [ ] 添加 License
-- [ ] 修改 README
-- [ ] (可选) 添加 Logo
+- [ √ ] 修改 README
+- [ x ] (可选) 添加 Logo
