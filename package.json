@@ -1,7 +1,7 @@
 {
-  "name": "app-counter",
+  "name": "app-metronome",
   "version": "0.1.0",
-  "description": "Template for a Netless Community App",
+  "description": "Netless App Metronome",
   "private": true,
   "main": "dist/index.cjs.js",
   "module": "dist/index.es.js",

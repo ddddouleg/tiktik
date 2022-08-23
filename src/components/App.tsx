@@ -1,6 +1,7 @@
 import type { AppContext } from "@netless/window-manager";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
+import { maxBpm, minBpm } from "./Constants";
 
 export interface AppProps {
   context: AppContext;
@@ -16,21 +17,65 @@ export interface AppProps {
  * in the `addStateChangedListener` callback.
  */
 export function App({ context }: AppProps) {
-  const [storage] = useState(() => context.createStorage("counter", { count: 0 }));
-  const [count, realSetCount] = useState(() => storage.state.count);
+  const [storage] = useState(() => context.createStorage("metronome", { 
+    bpm: 100  }));
+  const [bpm, realSetBpm] = useState(() => storage.state.bpm);
+  const [bpmValid, realSetBpmValid] = useState(true);
+  const [isPlaying, realSetIsPlaying] = useState(false);
+  const [timer, realSetTimer] = useState(0);
+  const [tempoDuration, realSetTempoDuration] = useState(0);
+
+  const bpmRef = useRef<HTMLInputElement | null>(null);
+
+  const click1 = new Audio("//daveceddia.com/freebies/react-metronome/click1.wav");
 
   useEffect(
-    () =>
+    () => 
       storage.addStateChangedListener(() => {
-        realSetCount(storage.state.count);
+        realSetBpm(storage.state.bpm);
       }),
     [storage]
   );
 
-  const setCount = (count: number) => {
-    storage.setState({ count });
-  };
+  const setBpmManual = () => {
+    const bpmNew = Number(bpmRef.current?.value);
+    if (bpmNew < minBpm || bpmNew > maxBpm) {
+      realSetBpmValid(false);
+    } else {
+      storage.setState({ bpm: bpmNew});
+      if (isPlaying && bpmNew != 0) {
+        clearInterval(timer);
+        realSetTimer(setInterval(() => click1.play(), (60 / bpmNew) * 1000));
+        realSetTempoDuration(120 / bpmNew);
+      }
+    }
+  }
 
-  console.log("<App /> count =", count);
-  return <button onClick={() => setCount(count + 1)}>{count}</button>;
+  const clickPlay = (isPlaying: boolean) => {
+    if (!isPlaying && bpm != 0) {
+      realSetTimer(setInterval(() => click1.play(), (60 / bpm) * 1000));
+      realSetTempoDuration(120 / bpm);
+    } else {
+      clearInterval(timer);
+      realSetTempoDuration(0);
+    }
+    realSetIsPlaying(!isPlaying);
+  }
+
+  // 窗口关闭组件不销毁。。
+
+  console.log("<App /> storage.state =", storage.state, isPlaying);
+  return <>
+    <div className="bpm-label">{bpmValid ? bpm : ""}</div>
+    <div className="bpm-setting">
+      <input type="number" min={minBpm} max={maxBpm} ref={bpmRef} placeholder={String(bpm)} />
+      {!bpmValid ? `bpm请限制在 ${minBpm}-${maxBpm} 内` : ""}
+      <button onClick={() => setBpmManual()}>set</button>
+      <button onClick={() => clickPlay(isPlaying)}>{isPlaying ? "stop" : "start"}</button>
+    </div>
+    <div className="tempo-wrapper" style={{
+      animationDuration: `${tempoDuration}s`,
+      WebkitAnimationDuration: `${tempoDuration}s`
+      }}><div className="tempo-hand"></div></div>
+  </>;
 }

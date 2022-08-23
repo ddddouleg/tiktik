@@ -20,14 +20,14 @@ import styles from "./style.css?inline";
  * Read more about how to make a netless app here:
  * https://github.com/netless-io/window-manager/blob/master/docs/develop-app.md
  */
-const Counter: NetlessApp = {
-  kind: "Counter",
+const Metronome: NetlessApp = {
+  kind: "Metronome",
   setup(context) {
     const box = context.getBox();
     box.mountStyles(styles);
 
     const $content = document.createElement("div");
-    $content.className = "app-counter";
+    $content.className = "app-metronome";
     box.mountContent($content);
 
     const root = createRoot($content);
@@ -40,4 +40,4 @@ const Counter: NetlessApp = {
   },
 };
 
-export default Counter;
+export default Metronome;
