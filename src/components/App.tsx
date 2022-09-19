@@ -18,12 +18,15 @@ export interface AppProps {
  */
 export function App({ context }: AppProps) {
   const [storage] = useState(() => context.createStorage("metronome", { 
-    bpm: 100  }));
+    bpm: 100,
+    isPlaying: false,
+    timer: 0,
+    tempoDuration: 0 }));
   const [bpm, realSetBpm] = useState(() => storage.state.bpm);
+  const [isPlaying, realSetIsPlaying] = useState(() => storage.state.isPlaying);
   const [bpmValid, realSetBpmValid] = useState(true);
-  const [isPlaying, realSetIsPlaying] = useState(false);
-  const [timer, realSetTimer] = useState(0);
-  const [tempoDuration, realSetTempoDuration] = useState(0);
+  const [timer, realSetTimer] = useState(() => storage.state.timer);
+  const [tempoDuration, realSetTempoDuration] = useState(() => storage.state.tempoDuration);
 
   const bpmRef = useRef<HTMLInputElement | null>(null);
 
@@ -34,7 +37,51 @@ export function App({ context }: AppProps) {
       storage.addStateChangedListener(() => {
         realSetBpm(storage.state.bpm);
       }),
-    [storage]
+    [storage.state.bpm]
+  );
+
+  useEffect(
+    () => 
+      storage.addStateChangedListener(() => {
+        console.log("isPlaying change",storage.state.isPlaying,isPlaying);
+        realSetIsPlaying(storage.state.isPlaying);
+        clearInterval(timer);
+        if (storage.state.isPlaying && storage.state.bpm != 0) {
+          realSetTimer(setInterval(() => click1.play(), (60 / bpm) * 1000));
+        }
+      }),
+    [storage.state.isPlaying]
+  );
+
+  useEffect(
+    () => {
+      storage.addStateChangedListener(() => {
+        realSetTimer(storage.state.timer);
+      })
+    },
+    [storage.state.timer]
+  );
+
+
+  useEffect(
+    () => {
+      clearInterval(timer);
+      if (isPlaying && bpm != 0) {
+        storage.setState({ timer: setInterval(() => click1.play(), (60 / bpm) * 1000)});
+      }
+      return () => {
+        clearInterval(timer);
+      }
+    },
+    []
+  );
+  
+  useEffect(
+    () => 
+      storage.addStateChangedListener(() => {
+        realSetTempoDuration(storage.state.tempoDuration);
+      }),
+    [storage.state.tempoDuration]
   );
 
   const setBpmManual = () => {
@@ -42,29 +89,29 @@ export function App({ context }: AppProps) {
     if (bpmNew < minBpm || bpmNew > maxBpm) {
       realSetBpmValid(false);
     } else {
+      realSetBpmValid(true);
       storage.setState({ bpm: bpmNew});
       if (isPlaying && bpmNew != 0) {
         clearInterval(timer);
-        realSetTimer(setInterval(() => click1.play(), (60 / bpmNew) * 1000));
-        realSetTempoDuration(120 / bpmNew);
+        storage.setState({ timer: setInterval(() => click1.play(), (60 / bpmNew) * 1000)});
+        storage.setState({ tempoDuration: 120 / bpmNew});
       }
     }
   }
 
   const clickPlay = (isPlaying: boolean) => {
     if (!isPlaying && bpm != 0) {
-      realSetTimer(setInterval(() => click1.play(), (60 / bpm) * 1000));
-      realSetTempoDuration(120 / bpm);
+      clearInterval(timer);
+      storage.setState({ timer: setInterval(() => click1.play(), (60 / bpm) * 1000)});
+      storage.setState({ tempoDuration: 120 / bpm});
     } else {
       clearInterval(timer);
-      realSetTempoDuration(0);
+      storage.setState({ tempoDuration: 0});
     }
-    realSetIsPlaying(!isPlaying);
+    storage.setState({isPlaying: !isPlaying});
   }
 
-  // 窗口关闭组件不销毁。。
-
-  console.log("<App /> storage.state =", storage.state, isPlaying);
+   console.log("<App /> storage.state =", storage.state);
   return <>
     <div className="bpm-label">{bpmValid ? bpm : ""}</div>
     <div className="bpm-setting">
